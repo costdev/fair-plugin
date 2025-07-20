@@ -123,6 +123,23 @@ function add_accept_header( $args, $url ) : array {
 }
 
 /**
+ * Check if the release is a GitHub release asset.
+ *
+ * @param  ReleaseDocument $release ReleaseDocument object.
+ *
+ * @return bool True if it is a GitHub release asset, false otherwise.
+ */
+function is_github_release_asset( $release ) : bool {
+	if ( isset( $release->artifacts->package[0] ) ) {
+		$url = $release->artifacts->package[0]->url ?? '';
+		$content_type = $release->artifacts->package[0]->{'content-type'} ?? '';
+		return str_contains( $url, 'api.github.com' ) && $content_type === 'application/octet-stream';
+	}
+
+	return false;
+}
+
+/**
  * Get the latest release for a DID.
  *
  * @param  string $id DID.
