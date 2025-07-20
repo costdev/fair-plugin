@@ -37,6 +37,8 @@ function get_fair_document_data( $obj ) : void {
 	// TODO: consider making $filepath, $type, $release protected and use get_* methods.
 	global  $release;
 
+	$type = $obj->get_type();
+	$filepath = $obj->get_filepath();
 	$packages = [];
 	// phpcs:disable HM.Security.NonceVerification.Recommended
 	if (
@@ -45,23 +47,23 @@ function get_fair_document_data( $obj ) : void {
 		&& $_REQUEST['action'] === ACTION_INSTALL
 	) {
 		$did = sanitize_text_field( wp_unslash( $_REQUEST['id'] ) );
-		if ( $did === $obj->package->id ) {
-			$release[ $did ] = $obj->release;
+		if ( $did === $obj->get_package()->id ) {
+			$release[ $did ] = $obj->get_release();
 		}
 	}
 	if ( $obj instanceof Updater ) {
-		$did = get_file_data( $obj->filepath, [
+		$did = get_file_data( $filepath, [
 			'PluginID' => 'Plugin ID',
 			'ThemeID' => 'Theme ID',
 		] );
-		$did = $obj->type === 'plugin' ? $did['PluginID'] : $did['ThemeID'];
-		$file = $obj->type === 'plugin' ? plugin_basename( $obj->filepath ) : dirname( plugin_basename( $obj->filepath ) );
+		$did = $type === 'plugin' ? $did['PluginID'] : $did['ThemeID'];
+		$file = $type === 'plugin' ? plugin_basename( $filepath ) : dirname( plugin_basename( $filepath ) );
 	}
 
 	if ( isset( $_REQUEST['action'] ) ) {
 		if ( 'update-selected' === $_REQUEST['action'] ) {
-			$packages = 'plugin' === $obj->type && isset( $_REQUEST['plugins'] ) ? array_map( 'dirname', explode( ',', sanitize_text_field( wp_unslash( $_REQUEST['plugins'] ) ) ) ) : [];
-			$packages = 'theme' === $obj->type && isset( $_REQUEST['themes'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_REQUEST['themes'] ) ) ) : $packages;
+			$packages = 'plugin' === $type && isset( $_REQUEST['plugins'] ) ? array_map( 'dirname', explode( ',', sanitize_text_field( wp_unslash( $_REQUEST['plugins'] ) ) ) ) : [];
+			$packages = 'theme' === $type && isset( $_REQUEST['themes'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_REQUEST['themes'] ) ) ) : $packages;
 		}
 		if ( 'update-plugin' === $_REQUEST['action'] && isset( $_REQUEST['plugin'] ) ) {
 			$packages[] = dirname( sanitize_text_field( wp_unslash( $_REQUEST['plugin'] ) ) );
@@ -74,7 +76,7 @@ function get_fair_document_data( $obj ) : void {
 
 	foreach ( $packages as $package ) {
 		if ( str_contains( $file, $package ) ) {
-			$release[ $did ] = $obj->release;
+			$release[ $did ] = $obj->get_release();
 			break;
 		}
 	}
