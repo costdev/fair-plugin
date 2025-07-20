@@ -7,6 +7,8 @@
 
 namespace FAIR\Packages;
 
+use function FAIR\Updater\is_github_release_asset;
+
 use WP_Error;
 use WP_Upgrader;
 
@@ -241,13 +243,7 @@ class Upgrader extends WP_Upgrader {
 		// Resolve the release artifact to a URL.
 		$artifact = pick_artifact_by_lang( $this->release->artifacts->package );
 
-		/**
-		 * Fires before upgrader_pre_download to use object data in filters.
-		 *
-		 * @param Upgrader Current class object.
-		 */
-		do_action( 'get_fair_document_data', $this );
-		add_filter( 'upgrader_pre_download', 'FAIR\\Updater\\upgrader_pre_download' );
+		add_filter( 'upgrader_pre_download', [ $this, 'upgrader_pre_download' ] );
 
 		// Download the package.
 		$path = $this->download_package( $artifact->url, false, $options['hook_extra'] );
@@ -690,5 +686,36 @@ class Upgrader extends WP_Upgrader {
 		}
 
 		return trailingslashit( $new_source );
+	}
+
+	/**
+	 * Filter HTTP request arguments to maybe add an Accept header.
+	 *
+	 * @param bool $reply The default reply.
+	 *
+	 * @return bool The default reply.
+	 */
+	public function upgrader_pre_download( $reply ) {
+		add_filter( 'http_request_args', [ $this, 'maybe_add_accept_header' ], 20, 2 );
+		return $reply;
+	}
+
+	/**
+	 * Add an Accept header if the release package is a GitHub release asset.
+	 *
+	 * @param array $args Array of HTTP request arguments.
+	 * @param string $url The URL being requested.
+	 * @return array
+	 */
+	public function maybe_add_accept_header( $args, $url ) {
+		if (
+			isset( $this->release->artifacts->package[0] )
+			&& $url === $this->release->artifacts->package[0]->url
+			&& is_github_release_asset( $this->release )
+		) {
+			$args = array_merge( $args, [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ] );
+		}
+
+		return $args;
 	}
 }
