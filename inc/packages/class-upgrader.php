@@ -19,14 +19,14 @@ class Upgrader extends WP_Upgrader {
 	 *
 	 * @var MetadataDocument
 	 */
-	public $package;
+	protected $package;
 
 	/**
 	 * Release document.
 	 *
 	 * @var ReleaseDocument
 	 */
-	public $release;
+	protected $release;
 
 	/**
 	 * Is this an upgrade?
@@ -690,5 +690,23 @@ class Upgrader extends WP_Upgrader {
 		}
 
 		return trailingslashit( $new_source );
+	}
+
+	/**
+	 * Get the package metadata.
+	 *
+	 * @return MetadataDocument|null The package metadata, or null if not set.
+	 */
+	public function get_package() {
+		return $this->package;
+	}
+
+	/**
+	 * Get the release document.
+	 *
+	 * @return ReleaseDocument|null The release document, or null if not set.
+	 */
+	public function get_release() {
+		return $this->release;
 	}
 }
