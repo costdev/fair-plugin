@@ -37,7 +37,7 @@ class Updater {
 	 *
 	 * @var string
 	 */
-	public $filepath;
+	protected $filepath;
 
 	/**
 	 * Current installed version of the package.
@@ -51,7 +51,7 @@ class Updater {
 	 *
 	 * @var string
 	 */
-	public $type;
+	protected $type;
 
 	/**
 	 * Metadata document.
@@ -65,7 +65,7 @@ class Updater {
 	 *
 	 * @var \FAIR\Packages\ReleaseDocument
 	 */
-	public $release;
+	protected $release;
 
 	/**
 	 * Constructor.
@@ -406,5 +406,32 @@ class Updater {
 		}
 
 		return trim( ob_get_clean(), '1' );
+	}
+
+	/**
+	 * Get the absolute filepath of the "main" file.
+	 *
+	 * @return string
+	 */
+	public function get_filepath() : string {
+		return $this->filepath;
+	}
+
+	/**
+	 * Get the type of the package.
+	 *
+	 * @return string
+	 */
+	public function get_type() : string {
+		return $this->type;
+	}
+
+	/**
+	 * Get the release document.
+	 *
+	 * @return FAIR\Packages\ReleaseDocument|null The release document, or null if not set.
+	 */
+	public function get_release() {
+		return $this->release;
 	}
 }
