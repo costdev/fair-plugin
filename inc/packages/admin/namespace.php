@@ -18,6 +18,7 @@ use WP_Upgrader_Skin;
 const TAB_DIRECT = 'fair_direct';
 const ACTION_INSTALL = 'fair-install-plugin';
 const ACTION_INSTALL_NONCE = 'fair-install-plugin';
+const ACTION_INSTALL_DID = 'fair-install-did';
 
 /**
  * Bootstrap.
@@ -69,14 +70,11 @@ function handle_did_during_ajax( $result, $action, $args ) {
 		return $result;
 	}
 
-	$release = Updater\get_latest_release_from_did( $did );
-	if ( is_wp_error( $release ) ) {
-		return $release;
-	}
+	wp_cache_set( ACTION_INSTALL_DID, $did );
+	Updater\add_package_to_release_cache( $did );
+	add_filter( 'http_request_args', 'FAIR\\Updater\\maybe_add_accept_header', 20, 2 );
 
-	return (object) [
-		'download_link' => $release->artifacts->package[0]->url,
-	];
+	return (object) Packages\get_update_data( $did );
 }
 
 /**

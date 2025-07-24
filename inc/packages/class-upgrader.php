@@ -7,6 +7,8 @@
 
 namespace FAIR\Packages;
 
+use const FAIR\Packages\Admin\ACTION_INSTALL_DID;
+
 use function FAIR\Updater\add_package_to_release_cache;
 
 use WP_Error;
@@ -719,6 +721,15 @@ class Upgrader extends WP_Upgrader {
 	 */
 	public function rename_source_selection( string $source, string $remote_source ) {
 		global $wp_filesystem;
+
+		$did = wp_cache_get( ACTION_INSTALL_DID ) ?? [];
+		if ( null === $this->package ) {
+			$this->package = (object) $this->package;
+			$this->package->id = $did;
+			if ( isset( $_REQUEST['slug'] ) ) {
+				$this->package->slug = explode( '-did--', $_REQUEST['slug'], 2 )[0];
+			}
+		}
 
 		if ( str_contains( $source, get_did_hash( $this->package->id ) ) && basename( $source ) === $this->package->slug ) {
 			return $source;
