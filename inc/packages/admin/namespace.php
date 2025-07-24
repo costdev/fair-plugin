@@ -51,7 +51,7 @@ function add_direct_tab( $tabs ) {
  *
  * @param mixed  $result The result of the plugins_api call.
  * @param string $action The action being performed.
- * @param array  $args   The arguments passed to the plugins_api call.
+ * @param object $args   The arguments passed to the plugins_api call.
  * @return mixed
  */
 function handle_did_during_ajax( $result, $action, $args ) {
