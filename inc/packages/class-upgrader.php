@@ -722,12 +722,15 @@ class Upgrader extends WP_Upgrader {
 	public function rename_source_selection( string $source, string $remote_source ) {
 		global $wp_filesystem;
 
-		$did = wp_cache_get( ACTION_INSTALL_DID ) ?? [];
-		if ( null === $this->package ) {
-			$this->package = (object) $this->package;
-			$this->package->id = $did;
-			if ( isset( $_REQUEST['slug'] ) ) {
-				$this->package->slug = explode( '-did--', $_REQUEST['slug'], 2 )[0];
+		if ( wp_doing_ajax() ) {
+			$did = wp_cache_get( ACTION_INSTALL_DID ) ?? [];
+			$metadata = fetch_package_metadata( $did );
+			if ( is_wp_error( $metadata ) ) {
+				return $metadata;
+			}
+			if ( null === $this->package ) {
+				$this->package = (object) $this->package;
+				$this->package = $metadata;
 			}
 		}
 
