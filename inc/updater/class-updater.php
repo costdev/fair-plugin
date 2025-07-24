@@ -150,9 +150,9 @@ class Updater {
 
 		$new_source = $source;
 
-		// Exit if installing.
+		// Installing.
 		if ( isset( $hook_extra['action'] ) && 'install' === $hook_extra['action'] ) {
-			return $source;
+			return ( new Packages\Upgrader() )->rename_source_selection( $source, $remote_source );
 		}
 
 		if ( ! $upgrader instanceof Plugin_Upgrader && ! $upgrader instanceof Theme_Upgrader ) {
