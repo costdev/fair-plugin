@@ -249,12 +249,15 @@ function set_slug_to_hashed() : void {
 	if ( ! isset( $_POST['slug'] ) ) {
 		return;
 	}
-	$did = 'did:' . explode( '-did:', str_replace( '--', ':', sanitize_text_field( wp_unslash( $_POST['slug'] ) ) ), 2 )[1];
+
+	$escaped_slug = sanitize_text_field( wp_unslash( $_POST['slug'] ) );
+	$did = 'did:' . explode( '-did:', str_replace( '--', ':', $escaped_slug ), 2 )[1];
 	if ( ! preg_match( '/^did:(web|plc):.+$/', $did ) ) {
 		return;
 	}
+
 	// Reset to proper hashed slug.
-	$_POST['slug'] = explode( '-did--', sanitize_text_field( wp_unslash( $_POST['slug'] ) ), 2 )[0] . '-' . Packages\get_did_hash( $did );
+	$_POST['slug'] = explode( '-did--', $escaped_slug, 2 )[0] . '-' . Packages\get_did_hash( $did );
 	// phpcs:enable
 }
 
