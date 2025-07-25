@@ -150,7 +150,7 @@ class Updater {
 
 		$new_source = $source;
 
-		// Installing.
+		// Exit if installing.
 		if ( isset( $hook_extra['action'] ) && 'install' === $hook_extra['action'] ) {
 			return $source;
 		}
