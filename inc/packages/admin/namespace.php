@@ -242,6 +242,8 @@ function handle_direct_install() {
 /**
  * Set slug to hashed slug from excaped slug-did.
  *
+ * Needed for check_plugin_dependencies_during_ajax().
+ *
  * @return void
  */
 function set_slug_to_hashed() : void {
