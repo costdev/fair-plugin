@@ -728,10 +728,7 @@ class Upgrader extends WP_Upgrader {
 			if ( is_wp_error( $metadata ) ) {
 				return $metadata;
 			}
-			if ( null === $this->package ) {
-				$this->package = (object) $this->package;
-				$this->package = $metadata;
-			}
+			$this->package ??= $metadata;
 		}
 
 		if ( str_contains( $source, get_did_hash( $this->package->id ) ) && basename( $source ) === $this->package->slug ) {
