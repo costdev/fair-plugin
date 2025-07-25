@@ -244,7 +244,6 @@ class Upgrader extends WP_Upgrader {
 		$artifact = pick_artifact_by_lang( $this->release->artifacts->package );
 
 		add_package_to_release_cache( $this->package->id );
-		add_filter( 'upgrader_pre_download', 'FAIR\\Packages\\upgrader_pre_download', 10, 1 );
 
 		// Download the package.
 		$path = $this->download_package( $artifact->url, false, $options['hook_extra'] );
