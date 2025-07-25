@@ -35,6 +35,7 @@ function bootstrap() {
 	add_action( 'load-plugin-install.php', __NAMESPACE__ . '\\load_plugin_install' );
 	add_action( 'install_plugins_pre_plugin-information', __NAMESPACE__ . '\\maybe_hijack_plugin_info', 0 );
 	add_action( 'update-custom_' . ACTION_INSTALL, __NAMESPACE__ . '\\handle_direct_install' );
+	add_action( 'wp_ajax_check_plugin_dependencies', __NAMESPACE__ . '\\set_slug_to_hashed' );
 }
 
 /**
@@ -236,6 +237,25 @@ function handle_direct_install() {
 	$skin = new WP_Upgrader_Skin();
 	Packages\install_plugin( $id, $skin, $version );
 	exit;
+}
+
+/**
+ * Set slug to hashed slug from excaped slug-did.
+ *
+ * @return void
+ */
+function set_slug_to_hashed() : void {
+	// phpcs:disable HM.Security.NonceVerification.Missing
+	if ( ! isset( $_POST['slug'] ) ) {
+		return;
+	}
+	$did = 'did:' . explode( '-did:', str_replace( '--', ':', sanitize_text_field( wp_unslash( $_POST['slug'] ) ) ), 2 )[1];
+	if ( ! preg_match( '/^did:(web|plc):.+$/', $did ) ) {
+		return;
+	}
+	// Reset to proper hashed slug.
+	$_POST['slug'] = explode( '-did--', sanitize_text_field( wp_unslash( $_POST['slug'] ) ), 2 )[0] . '-' . Packages\get_did_hash( $did );
+	// phpcs:enable
 }
 
 /**
