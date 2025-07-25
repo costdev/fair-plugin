@@ -723,7 +723,7 @@ class Upgrader extends WP_Upgrader {
 		global $wp_filesystem;
 
 		if ( wp_doing_ajax() ) {
-			$did = wp_cache_get( ACTION_INSTALL_DID ) ?? [];
+			$did = wp_cache_get( ACTION_INSTALL_DID ) ?? '';
 			$metadata = fetch_package_metadata( $did );
 			if ( is_wp_error( $metadata ) ) {
 				return $metadata;
