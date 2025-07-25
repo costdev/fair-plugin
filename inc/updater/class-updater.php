@@ -152,11 +152,7 @@ class Updater {
 
 		// Installing.
 		if ( isset( $hook_extra['action'] ) && 'install' === $hook_extra['action'] ) {
-			if ( wp_doing_ajax() ) {
-				return ( new Packages\Upgrader() )->rename_source_selection( $source, $remote_source );
-			} else {
-				return $source;
-			}
+			return $source;
 		}
 
 		if ( ! $upgrader instanceof Plugin_Upgrader && ! $upgrader instanceof Theme_Upgrader ) {

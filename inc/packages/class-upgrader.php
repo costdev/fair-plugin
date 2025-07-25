@@ -7,8 +7,6 @@
 
 namespace FAIR\Packages;
 
-use const FAIR\Packages\Admin\ACTION_INSTALL_DID;
-
 use function FAIR\Updater\add_package_to_release_cache;
 
 use WP_Error;
@@ -246,7 +244,7 @@ class Upgrader extends WP_Upgrader {
 		$artifact = pick_artifact_by_lang( $this->release->artifacts->package );
 
 		add_package_to_release_cache( $this->package->id );
-		add_filter( 'upgrader_pre_download', 'FAIR\\Updater\\upgrader_pre_download', 10, 1 );
+		add_filter( 'upgrader_pre_download', 'FAIR\\Packages\\upgrader_pre_download', 10, 1 );
 
 		// Download the package.
 		$path = $this->download_package( $artifact->url, false, $options['hook_extra'] );
@@ -709,38 +707,4 @@ class Upgrader extends WP_Upgrader {
 		$this->new_theme_data = $info;
 	}
 
-	/**
-	 * Renames a package's directory when it doesn't match the slug.
-	 *
-	 * This is commonly required for packages from Git hosts.
-	 *
-	 * @param string $source        Path of $source.
-	 * @param string $remote_source Path of $remote_source.
-	 *
-	 * @return string
-	 */
-	public function rename_source_selection( string $source, string $remote_source ) {
-		global $wp_filesystem;
-
-		if ( wp_doing_ajax() ) {
-			$did = wp_cache_get( ACTION_INSTALL_DID ) ?? '';
-			$metadata = fetch_package_metadata( $did );
-			if ( is_wp_error( $metadata ) ) {
-				return $metadata;
-			}
-			$this->package ??= $metadata;
-		}
-
-		if ( str_contains( $source, get_did_hash( $this->package->id ) ) && basename( $source ) === $this->package->slug ) {
-			return $source;
-		}
-
-		$new_source = trailingslashit( $remote_source ) . $this->package->slug . '-' . get_did_hash( $this->package->id );
-
-		if ( trailingslashit( strtolower( $source ) ) !== trailingslashit( strtolower( $new_source ) ) ) {
-			$wp_filesystem->move( $source, $new_source, true );
-		}
-
-		return trailingslashit( $new_source );
-	}
 }
